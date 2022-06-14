@@ -1,0 +1,1 @@
+#Reads data from amazonplug (CSV)
