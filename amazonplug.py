@@ -31,15 +31,25 @@ def generateOrdersReport(DAYS,FILENAME):
         dataStartTime=datetime.utcnow() - timedelta(days=DAYS))
 
     status = Reports(credentials=credentials).get_report(res.payload['reportId']).payload['processingStatus']
-    print("Generating Report")
+    print('Generating Report')
     while(status != 'DONE'):
         time.sleep(5)
         status = Reports(credentials=credentials).get_report(res.payload['reportId']).payload['processingStatus']
         print("...", end=" ")
 
     Reports(credentials=credentials).get_report_document(Reports(credentials=credentials).get_report(res.payload['reportId']).payload['reportDocumentId'], download=True, file=FILENAME)
-    print("Generated")
-    return FILENAME
+    print('Generated')
+    title = ' '
+    dic = {title: {}}
+    xmlparse = Xet.parse(FILENAME)
+    root = xmlparse.getroot()
+    for i in root.iter():
+        if(i.tag == 'AmazonOrderID'):
+            title = i.text
+            dic[title] = {}
+        else:
+            dic[title][i.tag] = i.text
+    return dic
 
 def generateMerchantReport(DAYS,FILENAME):
     res = Reports(credentials=credentials).create_report(
