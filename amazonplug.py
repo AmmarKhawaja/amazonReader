@@ -11,26 +11,16 @@ import xml.etree.ElementTree as Xet
 import pandas as pd
 import csv
 
-def xmlParse(FILENAME):
-    dic = {}
-    xmlparse = Xet.parse(FILENAME)
-    root = xmlparse.getroot()
-    #child = root.getchildren()
-    for i in root.iter():
-        dic[i.tag] = []
-    for i in root.iter():
-        dic[i.tag].append(i.text)
-    return dic
-
 def printOrders():
     print(Orders(credentials=credentials).get_orders(CreatedAfter=(datetime.utcnow() - timedelta(days=7)).isoformat()))
 
-def generateOrdersReport(DAYS,FILENAME):
+def generateOrdersReportFromNow(DAYS,FILENAME):
     res = Reports(credentials=credentials).create_report(
         reportType=ReportType.GET_XML_ALL_ORDERS_DATA_BY_ORDER_DATE_GENERAL,
         dataStartTime=datetime.utcnow() - timedelta(days=DAYS))
 
     status = Reports(credentials=credentials).get_report(res.payload['reportId']).payload['processingStatus']
+    #Generator Start
     print('Generating Report')
     while(status != 'DONE'):
         time.sleep(5)
@@ -39,17 +29,10 @@ def generateOrdersReport(DAYS,FILENAME):
 
     Reports(credentials=credentials).get_report_document(Reports(credentials=credentials).get_report(res.payload['reportId']).payload['reportDocumentId'], download=True, file=FILENAME)
     print('Generated')
-    title = ' '
-    dic = {title: {}}
+    #Generator End
     xmlparse = Xet.parse(FILENAME)
     root = xmlparse.getroot()
-    for i in root.iter():
-        if(i.tag == 'AmazonOrderID'):
-            title = i.text
-            dic[title] = {}
-        else:
-            dic[title][i.tag] = i.text
-    return dic
+    return root
 
 def generateMerchantReport(DAYS,FILENAME):
     res = Reports(credentials=credentials).create_report(
