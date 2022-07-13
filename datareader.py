@@ -1,9 +1,11 @@
 #Reads data from amazonplug (CSV)
-def parseOrderMonetary(FILE):
+def parseOrderMonetary(REPORT):
     title = ' '
     type = ' '
     dic = {}
-    for i in FILE.iter():
+    if REPORT is None:
+        return -1;
+    for i in REPORT.iter():
         if (i.tag == 'AmazonOrderID'):
             title = i.text
             dic[title] = {}
