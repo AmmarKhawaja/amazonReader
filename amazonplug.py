@@ -8,8 +8,7 @@ from sp_api.base.reportTypes import ReportType
 from datetime import datetime, timedelta
 import time
 import xml.etree.ElementTree as Xet
-import pandas as pd
-import csv
+
 def loadingReport(res):
     status = Reports(credentials=credentials).get_report(res.payload['reportId']).payload['processingStatus']
     # Generator Start
@@ -33,7 +32,7 @@ def generateOrdersReportFromNow(DAYS,FILENAME):
         print("Days cannot exceed 30")
         return;
     res = Reports(credentials=credentials).create_report(
-        reportType=ReportType.GET_FLAT_FILE_SALES_TAX_DATA,
+        reportType=ReportType.GET_XML_ALL_ORDERS_DATA_BY_ORDER_DATE_GENERAL,
         dataStartTime=datetime.utcnow() - timedelta(days=DAYS)
     )
     loadingReport(res)
