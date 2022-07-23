@@ -26,8 +26,10 @@ def getSalesByItem(REPORT):
         inst = dic[i]
         if 'ProductName' in inst and 'Principal' in inst:
             if inst['ProductName'] in sales:
-                sales[inst['ProductName']] += float(inst['Principal'])
+                sales[inst['ProductName']]['Total Principal'] += float(inst['Principal'])
+                sales[inst['ProductName']]['Total Sales'] += 1
+                sales[inst['ProductName']]['Avg Price'] = sales[inst['ProductName']]['Total Principal'] / sales[inst['ProductName']]['Total Sales']
             else:
-                sales[inst['ProductName']] = 0
-    print(sales)
+                sales[inst['ProductName']] = {'Total Principal': 0, 'Total Sales': 0, 'Avg Principal': 0}
+    return sales
 
