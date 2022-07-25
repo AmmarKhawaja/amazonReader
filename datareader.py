@@ -11,25 +11,27 @@ def parseOrderMonetary(REPORT):
             dic[title] = {}
         elif (i.tag == 'ProductName'):
             dic[title][i.tag] = i.text
+        elif(i.tag == 'PurchaseDate'):
+            dic[title][i.tag] = i.text[0:10]
         elif (i.tag == 'Type'):
             type = i.text
         elif (i.tag == 'Amount'):
             dic[title][type] = i.text
     return dic
 
-def getSalesByItem(REPORT):
+def getSalesByItemPrice(REPORT):
     dic = parseOrderMonetary(REPORT)
     sales = {}
     print(dic)
     for i in dic:
-        print(i)
         inst = dic[i]
         if 'ProductName' in inst and 'Principal' in inst:
             if inst['ProductName'] in sales:
-                sales[inst['ProductName']]['Total Principal'] += float(inst['Principal'])
-                sales[inst['ProductName']]['Total Sales'] += 1
-                sales[inst['ProductName']]['Avg Price'] = sales[inst['ProductName']]['Total Principal'] / sales[inst['ProductName']]['Total Sales']
+                if inst['Principal'] in sales[inst['ProductName']]:
+                    sales[inst['ProductName']][inst['Principal']] += 1
+                else:
+                    sales[inst['ProductName']][inst['Principal']] = 1
             else:
-                sales[inst['ProductName']] = {'Total Principal': 0, 'Total Sales': 0, 'Avg Principal': 0}
+                sales[inst['ProductName']] = {}
     return sales
 
