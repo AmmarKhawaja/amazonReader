@@ -22,7 +22,6 @@ def parseOrderMonetary(REPORT):
 def getSalesByItemPrice(REPORT):
     dic = parseOrderMonetary(REPORT)
     sales = {}
-    print(dic)
     for i in dic:
         inst = dic[i]
         if 'ProductName' in inst and 'Principal' in inst:
