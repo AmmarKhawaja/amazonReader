@@ -9,7 +9,7 @@ def parseOrderMonetary(REPORT):
         if (i.tag == 'AmazonOrderID'):
             title = i.text
             dic[title] = {}
-        elif (i.tag == 'ProductName'):
+        elif (i.tag == 'SKU'):
             dic[title][i.tag] = i.text
         elif(i.tag == 'PurchaseDate'):
             dic[title][i.tag] = i.text[0:10]
@@ -24,13 +24,39 @@ def getSalesByItemPrice(REPORT):
     sales = {}
     for i in dic:
         inst = dic[i]
-        if 'ProductName' in inst and 'Principal' in inst:
-            if inst['ProductName'] in sales:
-                if inst['Principal'] in sales[inst['ProductName']]:
-                    sales[inst['ProductName']][inst['Principal']] += 1
+        if 'SKU' in inst and 'Principal' in inst:
+            if inst['SKU'] in sales:
+                if inst['Principal'] in sales[inst['SKU']]:
+                    sales[inst['SKU']][inst['Principal']] += 1
                 else:
-                    sales[inst['ProductName']][inst['Principal']] = 1
+                    sales[inst['SKU']][inst['Principal']] = 1
             else:
-                sales[inst['ProductName']] = {}
+                sales[inst['SKU']] = {}
     return sales
 
+def getProfitByItemPrice(REPORT, SKU, COST):
+    dic = parseOrderMonetary(REPORT)
+    sales = {}
+    for i in dic:
+        inst = dic[i]
+        if 'SKU' in inst and 'Principal' in inst and inst['SKU'] == SKU:
+            if inst['SKU'] in sales:
+                if inst['Principal'] in sales[inst['SKU']]:
+                    sales[inst['SKU']][inst['Principal']] += float(inst['Principal']) - COST
+                else:
+                    sales[inst['SKU']][inst['Principal']] = float(inst['Principal']) - COST
+            else:
+                sales[inst['SKU']] = {}
+    return sales
+
+def getProfitChangeByPrice(REPORT, SKU, COST):
+    newReport = getProfitByItemPrice(REPORT, SKU, COST)
+    profitChanges = {}
+    pastProfit = 1
+    for i in newReport['CL1163']:
+        if profitChanges == {}:
+            profitChanges[i] = 1
+        else:
+            profitChanges[i] = newReport['CL1163'][i] / pastProfit
+        pastProfit = newReport['CL1163'][i]
+    return profitChanges
